@@ -73,6 +73,8 @@ O programa "Jogo da Adivinhação" oferece as seguintes funcionalidades:
 5.  Utilize o jogo:
     Siga as instruções exibidas no terminal para jogar, ver histórico ou ranking.
 
+6. Para mais informações de como utilizar o jogo de maneira mais direta no vs code ou dev++ acesse a ultima página do relatorio.
+
 ## Contribuição
 Este é um projeto acadêmico para a disciplina. Para contribuições dentro da equipe:
 1.  Certifique-se de que sua branch local está atualizada com a branch principal remota.
@@ -86,19 +88,3 @@ Este é um projeto acadêmico para a disciplina. Para contribuições dentro da 
     git push origin feature/sua-nova-funcionalidade
     ```
 5.  Abra um pull request para a branch principal do repositório do grupo.
-
-## Checklist de Desenvolvimento 
-- [ ] Implementar geração de número aleatório.
-- [ ] Implementar lógica de palpites e tentativas.
-- [ ] Desenvolver menu inicial.
-- [ ] Implementar exibição de histórico.
-- [ ] Implementar exibição de ranking.
-- [ ] Criar `struct` para jogador.
-- [ ] Utilizar ponteiros para número aleatório e tentativas[cite: 27].
-- [ ] Implementar salvamento de resultados em arquivo `.txt`[cite: 28].
-- [ ] Implementar salvamento de ranking em arquivo `.txt`[cite: 29].
-- [X] Escrever comentários claros no código[cite: 10].
-- [ ] Garantir commits regulares e mensagens descritivas.
-- [ ] Realizar testes básicos para cada funcionalidade.
-- [ ] Preparar relatório e apresentação[cite: 16, 17].
-- [ ] Atualizar este arquivo README.md com instruções de uso e informações finais.
