@@ -1,79 +1,89 @@
-#include <stdio.h>  // Para printf, scanf (embora a maioria esteja na interface)
-#include <stdlib.h> // Para EXIT_SUCCESS, EXIT_FAILURE 
-#include <time.h>   // Para srand, time 
+#include <stdio.h>  // Para operações básicas (printf, scanf).
+#include <stdlib.h> // Para srand, e EXIT_SUCCESS (indicador de sucesso).
+#include <time.h>   // Para time(), usada com srand.
 
-// Inclui os cabeçalhos dos módulos que serão utilizados
-#include "logica_jogo.h"
-#include "interface.h"
-#include "arquivos.h"
+// Incluímos os cabeçalhos de todos os nossos módulos.
+// Isso permite que o 'main' chame as funções definidas neles.
+#include "logica_jogo.h" // Módulo de lógica do jogo.
+#include "interface.h"   // Módulo de interface com o usuário.
+#include "arquivos.h"    // Módulo de manipulação de arquivos (histórico e ranking).
 
+// --- A Função principal: Onde o jogo ganha vida ---
+// Esta é a função 'main', o ponto de entrada do programa.
+// Ela gerencia o fluxo geral, chamando as funções dos outros módulos conforme necessário.
 int main() {
-    // É uma boa prática inicializar o gerador de números aleatórios APENAS UMA VEZ
+    // Inicializa o gerador de números aleatórios APENAS UMA VEZ no início.
+    // Usar 'time(NULL)' garante que a sequência de números seja diferente a cada execução.
+    srand(time(NULL));
 
-    int select_menu;
-    int teste_semente_teclado; // Para passar para a função de menu/geração
+    int select_menu;               // Guarda a opção selecionada no menu.
+    int teste_semente_teclado;     // Entrada do usuário para a semente de geração do número.
 
+    // Array para armazenar os 3 melhores jogadores do ranking.
+    // É uma estrutura que existe enquanto o programa está rodando.
+    Jogador ranking_top3[3];
+    // Ao iniciar, tentamos carregar o ranking salvo em disco.
+    carregarRanking(ranking_top3);
+
+    // Loop principal do jogo: mantém o menu ativo até o usuário escolher sair.
     do {
-        // A função mostrarMenu agora também obtém o teste_semente_teclado e a opção do menu
-        // Você precisa passar o endereço de teste_semente_teclado se o mostrarMenu for alterar
-        // ele diretamente, mas pelo que vimos, o scanf no mostrarMenu já altera a variável
-        // que você passa o endereço (&). A forma mais simples é retornar a opção.
-        // E o teste_semente_teclado pode ser lido dentro do loop, como você já faz,
-        // ou ser uma função separada. Vamos manter no main por enquanto para teste.
+      // --- CHAMA A FUNÇÃO mostrarMenu AQUI ---
+        // Passamos o ENDEREÇO (&) de teste_semente_teclado para a função mostrarMenu.
+        // A função vai preencher essa variável e retornar a opção do menu.
+        select_menu = mostrarMenu(&teste_semente_teclado);
 
-        printf("\nTESTE DE TECLADO (Digite um numero para a semente do numero aleatorio): ");
-        scanf("%d", &teste_semente_teclado); // Mantido aqui para demonstração
-
-        printf("\n----------- Jogo da Adivinhacao -----------\n");
-        printf("Menu\n");
-        printf("1 - Jogar\n");
-        printf("2 - Ver Historico\n");
-        printf("3 - Sair\n");
-        printf("Escolha uma opcao: ");
-        scanf("%d", &select_menu);
-
+        // Estrutura 'switch' para lidar com as diferentes opções do menu.
         switch (select_menu) {
-            case 1: {
-                Jogador jogador_atual;
-                jogador_atual.ganhou = 0; // Inicializa como não ganhou
+            case 1: { // Opção "Jogar": Inicia uma nova partida.
+                Jogador jogador_atual;         // Declara a struct para o jogador desta rodada.
+                jogador_atual.ganhou = 0;      // Por padrão, presume-se que não ganhou ainda.
 
                 printf("\nDigite seu nome de usuario: ");
-                scanf("%s", jogador_atual.nome);
+                scanf("%s", jogador_atual.nome); // Solicita o nome do jogador.
 
-                // Geração do numero aleatório usando a função de logica_jogo
+                // Chama a função do módulo 'logica_jogo' para gerar o número secreto.
+                // Passa o endereço (&) para que a função escreva o número diretamente na struct.
                 gerarNumero(&jogador_atual.numero_aleatorio, teste_semente_teclado, jogador_atual.nome);
 
-                // Lógica do jogo usando a função de logica_jogo
+                // Chama a função 'jogar' (do módulo 'logica_jogo') para iniciar a interação da partida.
+                // Passa o número secreto e o endereço da struct do jogador para que suas tentativas e palpites sejam atualizados.
                 int resultado_do_jogo = jogar(jogador_atual.numero_aleatorio, &jogador_atual);
 
-                // Exibe a mensagem final do jogo (parte da interface)
-                if (resultado_do_jogo == 1) { // Ganhou (já exibido dentro de jogar)
+                // Exibe uma mensagem final sobre o resultado do jogo.
+                if (resultado_do_jogo == 1) { // Se o jogo retornou 1 (vitória).
                     printf("O numero aleatorio era: %d\n\n", jogador_atual.numero_aleatorio);
-                } else { // Perdeu
+                } else { // Se o jogo retornou 0 (derrota).
                     printf("\n>>> VOCE PERDEU! <<<\n%s nao acertou o numero aleatorio em 5 tentativas.\nO numero aleatorio era: %d\n\n",
                         jogador_atual.nome, jogador_atual.numero_aleatorio);
                 }
 
-                // Salva o resultado no histórico usando a função de arquivos
+                // Salva os detalhes desta partida no arquivo de histórico.
                 salvarResultado(&jogador_atual);
+                // Tenta atualizar e salvar o ranking com o resultado do jogador desta rodada.
+                atualizarESalvarRanking(&jogador_atual, ranking_top3);
                 break;
             }
 
-            case 2:
-                // Chama a função de arquivos para exibir o histórico
+            case 2: // Opção "Ver Historico": Exibe todas as partidas jogadas.
+                // Chama a função do módulo 'arquivos' para mostrar o histórico.
                 exibirConteudoHistorico();
                 break;
 
-            case 3:
+            case 3: // Opção "Ver Ranking": Exibe o TOP 3 dos jogadores.
+                // Chama a função do módulo 'arquivos' para exibir o ranking.
+                exibirRanking(ranking_top3);
+                break;
+
+            case 4: // Opção "Sair": Finaliza o programa.
                 printf("\nSaindo do jogo... Ate a proxima!\n");
                 break;
 
-            default:
-                printf("\nOpcao invalida! Por favor, digite 1, 2 ou 3.\n");
+            default: // Caso o usuário digite uma opção inválida.
+                printf("\nOpcao invalida! Por favor, digite 1, 2, 3 ou 4.\n");
                 break;
         }
 
-    } while (select_menu != 3);
+    } while (select_menu != 4); // O loop continua enquanto a opção "Sair" não for escolhida.
 
-    return EXIT_SUCCESS; // Retorna 0 para indicar sucesso
+    return EXIT_SUCCESS; // Retorna 0, indicando que o programa foi executado com sucesso.
 }

@@ -1,14 +1,13 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-#include <stdio.h> // Para printf, scanf
+#include <stdio.h>
 
-// --- Protótipos das Funções da Interface ---
+// Protótipos das funções de interface do usuário.
 
-// Função para exibir o menu principal e obter a escolha do usuário.
-int mostrarMenu(int teste_semente_teclado); // Adaptei para receber a semente do teclado
-
-// Nota: A função mostrarHistorico agora não precisa ser declarada aqui
-// porque ela será uma chamada para exibirConteudoHistorico() que vem de arquivos.h
+// Exibe o menu principal e coleta a opção escolhida pelo usuário.
+// 'teste_semente_teclado_ptr': Ponteiro para onde o número de semente lido será armazenado.
+// Retorna a opção numérica selecionada.
+int mostrarMenu(int *teste_semente_teclado_ptr);
 
 #endif // INTERFACE_H
