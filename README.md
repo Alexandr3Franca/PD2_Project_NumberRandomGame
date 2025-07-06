@@ -63,7 +63,7 @@ O programa "Jogo da Adivinhação" oferece as seguintes funcionalidades:
     ```
 3.  Compile o programa (exemplo, ajuste conforme os nomes dos seus arquivos):
     ```bash
-    gcc -o jogo_adivinhacao main.c logica_jogo.c interface.c arquivos.c -Wall
+    gcc -o jogo_adivinhacao src/main.c src/logica_jogo.c src/interface.c src/arquivos.c -Wall
     ```
     (Ou, se tiver um Makefile: `make`)
 4.  Execute o programa:
